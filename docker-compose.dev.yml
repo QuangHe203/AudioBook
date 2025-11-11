@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # --- FastAPI service ---
+  fastapi-server:
+    build:
+        context: ./fastapi
+        dockerfile: Dockerfile
+    container_name: python-fastapi-server
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./fastapi:/app
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - directus
+    networks:
+      - app-network
+
+  # --- Directus service ---
+  directus:
+    image: directus/directus:11.5.1
+    container_name: directus-server
+    ports:
+      - "9000:8055"
+    volumes:
+      - ./database:/directus/database
+      - ./uploads:/directus/uploads
+      - ./extensions:/directus/extensions
+    environment:
+      SECRET: "replace-with-random-value"
+      ADMIN_EMAIL: "admin@example.com"
+      ADMIN_PASSWORD: "d1r3ctu5"
+      DB_CLIENT: "sqlite3"
+      DB_FILENAME: "/directus/database/data.db"
+      WEBSOCKETS_ENABLED: "true"
+
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: "*"
+      CORS_METHODS: "GET,POST,PATCH,DELETE,OPTIONS"
+      CORS_HEADERS: "Content-Type, Authorization"
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

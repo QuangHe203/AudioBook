@@ -1,0 +1,22 @@
+Trường	Kiểu dữ liệu	Ghi chú
+id	integer (Primary)	ID tự tăng
+title	string	Tên sách
+author	string	Tác giả
+description	text	Mô tả nội dung
+cover	file (relate directus_files)	Ảnh bìa
+pdf_file	file	File PDF gốc
+language	string	Ngôn ngữ (vd: "vi", "en")
+status	string (enum)	draft, processing, ready
+created_at	datetime	
+updated_at	datetime
+
+Trường	Kiểu dữ liệu	Ghi chú
+id	integer	
+book	relation → books.id	Sách mẹ
+title	string	Tên chương
+order	integer	Thứ tự chương
+text_content	text (longtext)	Nội dung chương (từ PDF hoặc nhập)
+audio_file	file (relation directus_files)	File âm thanh sau khi AI đọc
+ai_status	string	pending, processing, done, error
+duration	integer	Độ dài (giây)
+created_at	datetime	
