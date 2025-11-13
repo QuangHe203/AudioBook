@@ -11,6 +11,8 @@ services:
       - "8000:8000"
     volumes:
       - ./fastapi:/app
+      - ./uploads:/uploads
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     restart: unless-stopped
     environment:
       - PYTHONUNBUFFERED=1

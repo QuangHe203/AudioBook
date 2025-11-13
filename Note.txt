@@ -20,3 +20,6 @@ audio_file	file (relation directus_files)	File âm thanh sau khi AI đọc
 ai_status	string	pending, processing, done, error
 duration	integer	Độ dài (giây)
 created_at	datetime	
+
+docker-compose -f docker-compose.dev.yml down  
+docker-compose -f docker-compose.dev.yml up -d      
