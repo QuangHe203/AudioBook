@@ -1,9 +1,13 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import fitz
 import re
 import os
+from gtts import gTTS
+import tempfile
+import uuid
 
 app = FastAPI()
 
@@ -94,3 +98,38 @@ def process_pdf_by_id(file_data: FileId):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Lỗi khi xử lý PDF: {str(e)}")
+
+class TextToSpeech(BaseModel):
+    text: str
+    speed: float = 1.0  # Tốc độ đọc (0.5 - 2.0)
+
+@app.post("/text-to-speech/")
+def text_to_speech(data: TextToSpeech):
+    try:
+        if not data.text.strip():
+            raise HTTPException(status_code=400, detail="Text không được để trống")
+        
+        # Tạo tên file unique
+        audio_filename = f"audio_{uuid.uuid4().hex[:8]}.mp3"
+        temp_dir = tempfile.gettempdir()
+        audio_path = os.path.join(temp_dir, audio_filename)
+        
+        # Tạo audio từ text
+        tts = gTTS(
+            text=data.text,
+            lang='vi',  # Tiếng Việt
+            slow=False if data.speed >= 1.0 else True
+        )
+        
+        tts.save(audio_path)
+        
+        # Trả về file audio
+        return FileResponse(
+            path=audio_path,
+            media_type='audio/mpeg',
+            filename=audio_filename,
+            headers={"Content-Disposition": f"attachment; filename={audio_filename}"}
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi khi tạo audio: {str(e)}")
